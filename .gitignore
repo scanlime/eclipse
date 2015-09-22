@@ -1,0 +1,10 @@
+.DS_Store
+*.3dmbak
+*.rpt
+*.done
+*.summary
+*.smsg
+*.pin
+*.pof
+*.sof
+*.bak
