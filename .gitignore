@@ -1,4 +1,6 @@
 .DS_Store
+sensor-fpga/db/
+sensor-fpga/incremental_db/
 *.b#*
 *.s#*
 *.3dmbak
@@ -9,4 +11,5 @@
 *.pin
 *.pof
 *.sof
+*.rhl
 *.bak
