@@ -2,8 +2,8 @@
 
 import serial, sys
 
-port = serial.Serial("/dev/cu.usbserial", 115200)
-rbf = open("eclsensor.rbf", 'rb').read()
+port = serial.Serial("/dev/ttyAMA0", 115200)
+rbf = open("../sensor-fpga/eclsensor.rbf", 'rb').read()
 
 # Reset FPGA
 port.sendBreak()
@@ -14,4 +14,10 @@ for byte in rbf:
 	for bit in range(8):
 		pulses.append("\xff\xfe"[1 & (ord(byte) >> bit)])
 
+print "Sending..."
 port.write(''.join(pulses))
+print "Programmed."
+
+while True:
+    sys.stdin.read()
+
