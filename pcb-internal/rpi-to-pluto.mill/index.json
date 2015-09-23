@@ -4,29 +4,31 @@
   "version" : 4,
   "fixturing" : {
     "spoilboard" : {
-      "stockRegistration" : 1
+      "stockRegistration" : 0
     },
-    "bracket" : null
+    "bracket" : {
+      "stockRegistration" : 1
+    }
   },
   "plans" : [
-    "59EF80F7-6EF8-4C76-8705-950B88233D88"
+    "60E9BF12-B549-420F-92C0-CBCE052B42E2"
   ],
   "stock" : {
     "height" : 76.199,
-    "depth" : 1.447,
-    "flipped" : true,
+    "depth" : 1.701,
+    "flipped" : false,
     "laminate" : "8D174BD6-C35D-4CCA-9A16-32EE5E9C251D",
     "offset" : {
-      "y" : -0.0009922079311355247,
+      "y" : 9.588007792068865,
       "b" : 0,
       "z" : 0,
-      "x" : -9.297490942583586e-05,
+      "x" : 5.787907025090574,
       "a" : 0,
       "c" : 0
     },
-    "width" : 99.999,
+    "width" : 50.8,
     "name" : "(unknown)",
-    "zrotation" : -0.0001215744601825391
+    "zrotation" : 0.001346399912848238
   },
   "displayUnits" : "mm",
   "showDimensions" : true,
@@ -102,7 +104,7 @@
   ],
   "showMotionPlan" : true,
   "otherplanVersion" : "0.14.3",
-  "stepSize" : 0,
+  "stepSize" : 1,
   "laminates" : [
     {
       "uuid" : "8D174BD6-C35D-4CCA-9A16-32EE5E9C251D",
