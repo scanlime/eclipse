@@ -1,0 +1,129 @@
+{
+  "snapOnDrag" : true,
+  "millVersion" : 2,
+  "version" : 4,
+  "fixturing" : {
+    "spoilboard" : {
+      "stockRegistration" : 1
+    },
+    "bracket" : null
+  },
+  "plans" : [
+    "59EF80F7-6EF8-4C76-8705-950B88233D88"
+  ],
+  "stock" : {
+    "height" : 76.199,
+    "depth" : 1.447,
+    "flipped" : true,
+    "laminate" : "8D174BD6-C35D-4CCA-9A16-32EE5E9C251D",
+    "offset" : {
+      "y" : -0.0009922079311355247,
+      "b" : 0,
+      "z" : 0,
+      "x" : -9.297490942583586e-05,
+      "a" : 0,
+      "c" : 0
+    },
+    "width" : 99.999,
+    "name" : "(unknown)",
+    "zrotation" : -0.0001215744601825391
+  },
+  "displayUnits" : "mm",
+  "showDimensions" : true,
+  "otherplanVersionName" : "release-build",
+  "currentJobUUID" : null,
+  "tools" : [
+    {
+      "group" : "Endmill",
+      "conductive" : "yes",
+      "flutes" : 2,
+      "name" : "1\/32in Flat End Mill",
+      "profile" : [
+        [
+          3.175,
+          36.5,
+          0,
+          0
+        ],
+        [
+          3.175,
+          9.5,
+          0,
+          -1
+        ],
+        [
+          0.79375,
+          1.5875,
+          0,
+          1
+        ],
+        [
+          0.79375,
+          0,
+          0,
+          1
+        ]
+      ],
+      "uuid" : "FFC3953B-A29D-4C22-8263-975B2722ADBC"
+    },
+    {
+      "group" : "Endmill",
+      "conductive" : "yes",
+      "flutes" : 2,
+      "name" : "1\/64in Flat End Mill",
+      "profile" : [
+        [
+          3.175,
+          36.5,
+          0,
+          0
+        ],
+        [
+          3.175,
+          9.5,
+          0,
+          -1
+        ],
+        [
+          0.396875,
+          0.79375,
+          0,
+          1
+        ],
+        [
+          0.396875,
+          0,
+          0,
+          1
+        ]
+      ],
+      "uuid" : "3381ABD5-760A-4AB8-A220-755161C1B770"
+    }
+  ],
+  "showMotionPlan" : true,
+  "otherplanVersion" : "0.14.3",
+  "stepSize" : 0,
+  "laminates" : [
+    {
+      "uuid" : "8D174BD6-C35D-4CCA-9A16-32EE5E9C251D",
+      "group" : "Circuit Board",
+      "maxDepth" : 1.8,
+      "name" : "Double-Sided FR-1 L2",
+      "minDepth" : 1,
+      "layers" : [
+        {
+          "fixed" : 0.1,
+          "material" : "copper"
+        },
+        {
+          "float" : 1.44,
+          "material" : "phenolic"
+        },
+        {
+          "fixed" : 0.1,
+          "material" : "copper"
+        }
+      ]
+    }
+  ]
+}
