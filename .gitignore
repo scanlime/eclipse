@@ -1,4 +1,6 @@
 .DS_Store
+*.b#*
+*.s#*
 *.3dmbak
 *.rpt
 *.done
