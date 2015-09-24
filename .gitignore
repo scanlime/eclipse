@@ -13,3 +13,4 @@ sensor-fpga/incremental_db/
 *.sof
 *.rhl
 *.bak
+*.qws
