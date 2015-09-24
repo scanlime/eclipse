@@ -92,3 +92,11 @@ set_location_assignment PIN_30 -to ir_rx[16]
 set_location_assignment PIN_47 -to ir_rx[17]
 set_location_assignment PIN_49 -to ir_rx[18]
 set_location_assignment PIN_50 -to ir_rx[19]
+set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
+set_global_assignment -name PLACEMENT_EFFORT_MULTIPLIER 2
+set_global_assignment -name ROUTER_EFFORT_MULTIPLIER 2
+set_global_assignment -name FINAL_PLACEMENT_OPTIMIZATION ALWAYS
+set_global_assignment -name FITTER_AGGRESSIVE_ROUTABILITY_OPTIMIZATION ALWAYS
+set_global_assignment -name AUTO_GLOBAL_MEMORY_CONTROLS ON
+set_global_assignment -name AUTO_PACKED_REGISTERS "MINIMIZE AREA"
