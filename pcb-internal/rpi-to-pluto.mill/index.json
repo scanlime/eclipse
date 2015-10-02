@@ -104,7 +104,7 @@
   ],
   "showMotionPlan" : true,
   "otherplanVersion" : "0.14.3",
-  "stepSize" : 1,
+  "stepSize" : 0,
   "laminates" : [
     {
       "uuid" : "8D174BD6-C35D-4CCA-9A16-32EE5E9C251D",
