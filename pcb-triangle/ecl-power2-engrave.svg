@@ -5,22 +5,22 @@
 	 width="690px" height="616px" viewBox="0 0 690 616" enable-background="new 0 0 690 616" xml:space="preserve">
 <g id="Model::Top_Half::FR1::Engrave">
 	
-		<line fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" x1="519.506" y1="56.115" x2="339.509" y2="57.134"/>
-	<path fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M231.51,57.745
-		c-16.104,0.091-32.208,0.182-48.312,0.273c32.452,79.077,49.381,163.661,49.865,249.137"/>
-	<path fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M471.817,305.804
-		c-0.412-72.84,31.335-142.151,86.76-189.416c2.794-2.383,5.639-4.702,8.537-6.958"/>
+		<line fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" x1="410.804" y1="57.134" x2="230.807" y2="56.115"/>
+	<path fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M517.25,307.155
+		c0.483-85.476,17.412-170.06,49.864-249.137c-16.104-0.091-32.208-0.182-48.312-0.273"/>
+	<path fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M183.198,109.43
+		c2.898,2.256,5.743,4.575,8.537,6.958c55.425,47.265,87.172,116.576,86.76,189.416"/>
 	
-		<line fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" x1="316.378" y1="307.069" x2="351.198" y2="306.755"/>
+		<line fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" x1="399.114" y1="306.755" x2="433.935" y2="307.069"/>
 	
-		<line fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" x1="320.894" y1="274.175" x2="354.341" y2="283.861"/>
+		<line fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" x1="395.972" y1="283.861" x2="429.418" y2="274.175"/>
 	
-		<line fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" x1="334.662" y1="243.944" x2="363.924" y2="262.82"/>
-	<path fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M375.237,248.979
-		c2.425-2.218,4.855-4.5,7.011-6.979c6.015-6.92,9.887-15.386,16.041-21.446c22.826-22.476,77.052-11.85,77.674,38.754"/>
-	<path fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M316.375,306.684
-		c-0.179-31.659,12.753-61.98,35.726-83.765c2.356-2.234,6.104-2.037,8.213,0.433c5.092,5.963,10.184,11.926,15.275,17.889
-		c1.938,2.27,1.785,5.654-0.352,7.739c-15.485,15.112-24.163,35.87-24.041,57.507C339.59,306.553,327.982,306.618,316.375,306.684z"
+		<line fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" x1="386.389" y1="262.82" x2="415.65" y2="243.944"/>
+	<path fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M274.35,259.308
+		c0.622-50.604,54.848-61.23,77.674-38.754c6.154,6.06,10.025,14.526,16.041,21.446c2.156,2.479,4.586,4.761,7.012,6.979"/>
+	<path fill="none" stroke="#67BD45" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M399.116,306.487
+		c0.122-21.637-8.556-42.396-24.04-57.507c-2.138-2.085-2.291-5.469-0.353-7.739c5.091-5.963,10.183-11.926,15.274-17.889
+		c2.109-2.47,5.857-2.667,8.213-0.433c22.974,21.785,35.906,52.106,35.727,83.765C422.33,306.618,410.723,306.553,399.116,306.487z"
 		/>
 </g>
 </svg>
