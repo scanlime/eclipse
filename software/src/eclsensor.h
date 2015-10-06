@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdint.h>
+#include <sys/time.h>
 
 
 class EclSensor
@@ -43,9 +44,12 @@ public:
     static const unsigned kRxCount = 20;
     static const unsigned kRxTimerNybbles = 4;
 
+    static const int kNumRetries = 10;
+    static const int kPacketTimeoutMillisec = 100;
+
     struct Packet {
         unsigned tx_id;
-        unsigned rx_timers[kRxCount];
+        uint32_t rx_timers[kRxCount];
     };
 
     bool init(const char *rbf_path, const char *serial_path);
@@ -53,7 +57,7 @@ public:
 
 private:
     int serial_fd;
-    char block_buffer[4096];
+    char block_buffer[512];
     unsigned block_offset, block_len;
     Packet line_buffer;
     unsigned line_column;
@@ -101,89 +105,112 @@ inline bool EclSensor::init(const char *rbf_path, const char *serial_path)
     options.c_cc[VMIN] = 0;
     options.c_cc[VTIME] = 0;
 
-    // Start at 115200 baud for FPGA configuration
-    cfsetispeed(&options, B115200);
-    cfsetospeed(&options, B115200);
-    tcsetattr(serial_fd, TCSANOW, &options);
+    for (int tries = 0; tries <= kNumRetries; tries++) {
 
-    fprintf(stderr, "Configuring FPGA... ");
+        // Start out assuming the FPGA is configured.
+        // It sends back data at 921600 baud (wow, such fast)
+        cfsetispeed(&options, B921600);
+        cfsetospeed(&options, B921600);
+        tcsetattr(serial_fd, TCSANOW, &options);
 
-    // Send a Break for at least 50ms to reset the FPGA. On Linux,
-    // the tcsendbreak duration unit is defined as between .25 and .5 sec.
-    tcsendbreak(serial_fd, 1);
+        // Reset receiver state
 
-    // The FPGA is configured with bits from a .rbf file, LSB-first.
-    // The Pluto FPGA board has a circuit that will read a short pulse
-    // as 0 and a longer pulse as 1. We can send 3 pulses per UART byte.
-    // Operate on groups of 64 UART bytes / 192 pulses / 24 RBF bytes,
-    // padded out to the nearest block. (After the FPGA is configured,
-    // extra input is ignored.)
+        block_offset = 0;
+        block_len = 0;
+        line_column = 0;
+        memset(&line_buffer, 0, sizeof line_buffer);
 
-    uint8_t rbf_block[24];
-    uint8_t uart_block[64];
+        // Make sure we are receiving good data
 
-    while (1) {
-        memset(rbf_block, 0, sizeof rbf_block);
-        memset(uart_block, 0, sizeof rbf_block);
-
-        if (fread(rbf_block, 1, sizeof rbf_block, rbf_file) <= 0) {
-            break;
-        }
-
-        for (unsigned byte = 0; byte < sizeof uart_block; byte++) {
-            unsigned bit[3];
-            for (unsigned i = 0; i < 3; i++) {
-                unsigned index = byte * 3 + i;
-                bit[i] = 1 & (rbf_block[index >> 3] >> (index & 7));
+        fprintf(stderr, "Checking FPGA... ");
+        struct timeval start_time;
+        gettimeofday(&start_time, 0);
+        while (1) {
+            if (poll()) {
+                // Success, we got a good packet back.
+                fprintf(stderr, "ok\n");
+                return true;
             }
-            // [start 0]x1 0x1 0x1[1 stop]
-            uart_block[byte] = 0x92 | bit[0] | (bit[1] << 3) | (bit[2] << 6);
+
+            usleep(1);
+
+            struct timeval now;
+            gettimeofday(&now, 0);
+            long millis = (now.tv_sec - start_time.tv_sec) * 1000 +
+                          (now.tv_usec - start_time.tv_usec) / 1000;
+            if (millis >= kPacketTimeoutMillisec) {
+                fprintf(stderr, "timeout\n");
+                break;
+            }
         }
 
-        unsigned offset = 0;
-        while (offset < sizeof uart_block) {
-            int result = write(serial_fd, uart_block + offset, sizeof uart_block - offset);
-            if (result < 0) {
-                if (errno == EAGAIN) {
-                    tcdrain(serial_fd);
-                } else {
-                    perror("Failed while writing to configure the FPGA");
+        // Nope. Assume it isn't configured.
+        fprintf(stderr, "Configuring FPGA... ");
+        rewind(rbf_file);
+
+        // Start at 115200 baud for FPGA configuration
+        cfsetispeed(&options, B115200);
+        cfsetospeed(&options, B115200);
+        tcsetattr(serial_fd, TCSANOW, &options);
+
+        // Send a Break for at least 50ms to reset the FPGA.
+        // This is detected by a discrete circuit on the Pluto board.
+        // On Linux, the tcsendbreak duration unit is defined as between .25 and .5 sec.
+
+        tcsendbreak(serial_fd, 1);
+
+        // The FPGA is configured with bits from a .rbf file, LSB-first.
+        // The Pluto FPGA board has a circuit that will read a short pulse
+        // as 0 and a longer pulse as 1. We can send 3 pulses per UART byte.
+        // Operate on groups of 64 UART bytes / 192 pulses / 24 RBF bytes,
+        // padded out to the nearest block. (After the FPGA is configured,
+        // extra input is ignored.)
+
+        uint8_t rbf_block[24];
+        uint8_t uart_block[64];
+
+        while (1) {
+            memset(rbf_block, 0, sizeof rbf_block);
+            memset(uart_block, 0, sizeof rbf_block);
+
+            if (fread(rbf_block, 1, sizeof rbf_block, rbf_file) <= 0) {
+                break;
+            }
+
+            for (unsigned byte = 0; byte < sizeof uart_block; byte++) {
+                unsigned bit[3];
+                for (unsigned i = 0; i < 3; i++) {
+                    unsigned index = byte * 3 + i;
+                    bit[i] = 1 & (rbf_block[index >> 3] >> (index & 7));
                 }
-            } else {
-                offset += result;
+                // [start 0]x1 0x1 0x1[1 stop]
+                uart_block[byte] = 0x92 | bit[0] | (bit[1] << 3) | (bit[2] << 6);
+            }
+
+            unsigned offset = 0;
+            while (offset < sizeof uart_block) {
+                int result = write(serial_fd, uart_block + offset, sizeof uart_block - offset);
+                if (result < 0) {
+                    if (errno == EAGAIN) {
+                        tcdrain(serial_fd);
+                    } else {
+                        perror("Failed while writing to configure the FPGA");
+                    }
+                } else {
+                    offset += result;
+                }
             }
         }
+
+        // Finish sending the last block
+        tcdrain(serial_fd);
+        fprintf(stderr, "done\n");
+
+        // Try again...
     }
 
-    fclose(rbf_file);
-
-    // Finish sending the last block
-    tcdrain(serial_fd);
-    fprintf(stderr, "done\n");
-
-    // Now the FPGA should be configured, and it will be sending results back
-    // at a much higher baud rate. Switch speeds.
-
-    cfsetispeed(&options, B921600);
-    cfsetospeed(&options, B921600);
-    tcsetattr(serial_fd, TCSANOW, &options);
-
-    // Reset receiver state
-
-    block_offset = 0;
-    block_len = 0;
-    line_column = 0;
-    memset(&line_buffer, 0, sizeof line_buffer);
-
-    // Make sure we are receiving good data
-
-    fprintf(stderr, "Checking FPGA... ");
-    while (!poll()) {
-        usleep(1);
-    }
-    fprintf(stderr, "ok\n");
-
-    return true;
+    // Out of tries
+    return false;
 }
 
 inline const EclSensor::Packet* EclSensor::poll()
@@ -198,7 +225,8 @@ inline const EclSensor::Packet* EclSensor::poll()
                 block_len = retval;
                 block_offset = 0;
             } else {
-                if (errno != EAGAIN) {
+                // Not ready
+                if (retval < 0 && errno != EAGAIN) {
                     perror("Error reading from FPGA serial port");
                 }
                 return 0;
@@ -217,7 +245,7 @@ inline const EclSensor::Packet* EclSensor::poll()
 
             if (c == '\n' || c == '\r') {
                 // Line endings, return a packet if we have one.
-                if (line_column == 1 + kRxTimerNybbles * kRxCount) {
+                if (line_column == 2 + kRxTimerNybbles * kRxCount) {
                     line_column = 0;
                     return &line_buffer;
                 } else {
@@ -231,9 +259,9 @@ inline const EclSensor::Packet* EclSensor::poll()
             } else {
                 // Hex digit, one rx timer nybble
                 int rx_id = (line_column - 1) / kRxTimerNybbles;
-                int shift = 4 * ((line_column - 1) % kRxTimerNybbles);
-                unsigned mask = 0xF << shift;
-                unsigned bits = ((c_digit < 10) ? c_digit : c_lower) << shift;
+                int shift = 4 * (kRxTimerNybbles - 1 - ((line_column - 1) % kRxTimerNybbles));
+                uint32_t mask = 0xF << shift;
+                uint32_t bits = (0xF & ((c_digit < 10) ? c_digit : c_lower)) << shift;
                 line_buffer.rx_timers[rx_id] = (line_buffer.rx_timers[rx_id] & (~mask)) | bits;
                 line_column++;
             }
