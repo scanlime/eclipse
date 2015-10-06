@@ -1,0 +1,131 @@
+{
+  "snapOnDrag" : true,
+  "millVersion" : 2,
+  "version" : 4,
+  "fixturing" : {
+    "spoilboard" : {
+      "stockRegistration" : 0
+    },
+    "bracket" : {
+      "stockRegistration" : 1
+    }
+  },
+  "plans" : [
+    "6AF3A8F0-FD3C-439D-A4F6-522C477EDDE2"
+  ],
+  "stock" : {
+    "height" : 50.8,
+    "depth" : 1.651,
+    "flipped" : false,
+    "laminate" : "8D174BD6-C35D-4CCA-9A16-32EE5E9C251D",
+    "offset" : {
+      "y" : 9.621007792068864,
+      "b" : 0,
+      "z" : 0,
+      "x" : 5.718907025090574,
+      "a" : 0,
+      "c" : 0
+    },
+    "width" : 76.199,
+    "name" : "(unknown)",
+    "zrotation" : -0.0003599345702578494
+  },
+  "displayUnits" : "mm",
+  "showDimensions" : true,
+  "otherplanVersionName" : "release-build",
+  "currentJobUUID" : null,
+  "tools" : [
+    {
+      "group" : "Endmill",
+      "conductive" : "yes",
+      "flutes" : 2,
+      "name" : "1\/32in Flat End Mill",
+      "profile" : [
+        [
+          3.175,
+          36.5,
+          0,
+          0
+        ],
+        [
+          3.175,
+          9.5,
+          0,
+          -1
+        ],
+        [
+          0.79375,
+          1.5875,
+          0,
+          1
+        ],
+        [
+          0.79375,
+          0,
+          0,
+          1
+        ]
+      ],
+      "uuid" : "FFC3953B-A29D-4C22-8263-975B2722ADBC"
+    },
+    {
+      "group" : "Endmill",
+      "conductive" : "yes",
+      "flutes" : 2,
+      "name" : "1\/64in Flat End Mill",
+      "profile" : [
+        [
+          3.175,
+          36.5,
+          0,
+          0
+        ],
+        [
+          3.175,
+          9.5,
+          0,
+          -1
+        ],
+        [
+          0.396875,
+          0.79375,
+          0,
+          1
+        ],
+        [
+          0.396875,
+          0,
+          0,
+          1
+        ]
+      ],
+      "uuid" : "3381ABD5-760A-4AB8-A220-755161C1B770"
+    }
+  ],
+  "showMotionPlan" : true,
+  "otherplanVersion" : "0.14.3",
+  "stepSize" : 1,
+  "laminates" : [
+    {
+      "uuid" : "8D174BD6-C35D-4CCA-9A16-32EE5E9C251D",
+      "group" : "Circuit Board",
+      "maxDepth" : 1.8,
+      "name" : "Double-Sided FR-1 L2",
+      "minDepth" : 1,
+      "layers" : [
+        {
+          "fixed" : 0.1,
+          "material" : "copper"
+        },
+        {
+          "float" : 1.44,
+          "material" : "phenolic"
+        },
+        {
+          "fixed" : 0.1,
+          "material" : "copper"
+        }
+      ]
+    }
+  ]
+}
