@@ -5,7 +5,7 @@ static Narrator narrator;
 
 int main(int argc, char **argv)
 {
-    narrator.runner.setLayout("layouts/window6x12.json");
+    narrator.runner.setLayout("layouts/strip64.json");
     if (!narrator.runner.parseArguments(argc, argv)) {
         return 1;
     }
