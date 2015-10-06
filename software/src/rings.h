@@ -20,16 +20,14 @@
 #include "lib/effect.h"
 #include "lib/noise.h"
 #include "lib/texture.h"
-#include "lib/camera_flow.h"
 
 
 class RingsEffect : public Effect
 {
 public:
-    RingsEffect(CameraFlowAnalyzer& flow, const rapidjson::Value &config)
+    RingsEffect(const rapidjson::Value &config)
         : xyzSpeed(config["xyzSpeed"].GetDouble()),
           xyzScale(config["xyzScale"].GetDouble()),
-          flowScale(config["flowScale"].GetDouble()),
           wSpeed(config["wSpeed"].GetDouble()),
           wRate(config["wRate"].GetDouble()),
           ringScale(config["ringScale"].GetDouble()),
@@ -46,7 +44,6 @@ public:
           initialThreshold(config["initialThreshold"].GetDouble()),
           brightnessOctaves(config["brightnessOctaves"].GetUint()),
           colorOctaves(config["colorOctaves"].GetUint()),
-          flow(flow),
           palette(config["palette"].GetString())
     {
         reseed(29);
@@ -54,7 +51,6 @@ public:
 
     float xyzSpeed;
     float xyzScale;
-    float flowScale;
     float wSpeed;
     float wRate;
     float ringScale;
@@ -71,8 +67,6 @@ public:
     float initialThreshold;
     unsigned brightnessOctaves;
     unsigned colorOctaves;
-    
-    CameraFlowCapture flow;
 
     // Sample colors along a curved path through a texture
     Texture palette;
@@ -94,7 +88,6 @@ public:
     virtual void beginFrame(const FrameInfo &f)
     {
         timer += f.timeDelta;
-        flow.capture();
 
         spacing = sq(0.5 + noise2(timer * ringScaleRate, 1.5)) * ringScale;
 
@@ -132,7 +125,7 @@ public:
     virtual void shader(Vec3& rgb, const PixelInfo &p) const
     {
         // Noise sampling location
-        Vec4 s = Vec4(p.point * xyzScale + flow.model * flowScale, seed) + d;
+        Vec4 s = Vec4(p.point * xyzScale, seed) + d;
 
         // Ring function, displaces the noise sampling coordinate
         float dist = len(p.point - center);
@@ -239,9 +232,6 @@ public:
 
     void reseed(unsigned seed)
     {
-        flow.capture();
-        flow.origin();
-
         PRNG prng;
         prng.seed(seed);
         this->seed = prng.uniform(0, 1024);

@@ -15,7 +15,6 @@
 #include "lib/effect_tap.h"
 #include "lib/prng.h"
 #include "lib/sampler.h"
-#include "lib/camera_flow.h"
 #include "lib/brightness.h"
 
 
@@ -43,7 +42,6 @@ public:
     void setup();
     void run();
 
-    CameraFlowAnalyzer flow;
     NEffectRunner runner;
     EffectMixer mixer;
     Brightness brightness;

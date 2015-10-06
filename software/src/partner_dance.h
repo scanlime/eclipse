@@ -18,7 +18,7 @@
 class PartnerDance : public ParticleEffect
 {
 public:
-    PartnerDance(CameraFlowAnalyzer& flow, const rapidjson::Value &config);
+    PartnerDance(const rapidjson::Value &config);
     void reseed(uint32_t seed);
 
     virtual void beginFrame(const FrameInfo &f);
@@ -44,7 +44,6 @@ private:
     float jitterRate;
     float jitterStrength;
     float jitterScale;
-    float flowScale;
     float brightness;
     float targetGain;
     float dampingRate;
@@ -58,8 +57,6 @@ private:
         Vec2 position;
         Vec2 velocity;
     };
-
-    CameraFlowCapture flow;
 
     std::vector<ParticleDynamics> dynamics;
     float timeDeltaRemainder;
@@ -77,7 +74,7 @@ private:
  *****************************************************************************************/
 
 
-inline PartnerDance::PartnerDance(CameraFlowAnalyzer& flow, const rapidjson::Value &config)
+inline PartnerDance::PartnerDance(const rapidjson::Value &config)
     : palette(config["palette"].GetString()),
       particlesPerDancer(config["particlesPerDancer"].GetUint()),
       numParticles(particlesPerDancer * numDancers),
@@ -93,7 +90,6 @@ inline PartnerDance::PartnerDance(CameraFlowAnalyzer& flow, const rapidjson::Val
       jitterRate(config["jitterRate"].GetDouble()),
       jitterStrength(config["jitterStrength"].GetDouble()),
       jitterScale(config["jitterScale"].GetDouble()),
-      flowScale(config["flowScale"].GetDouble()),
       brightness(config["brightness"].GetDouble()),
       targetGain(config["targetGain"].GetDouble()),
       dampingRate(config["dampingRate"].GetDouble()),
@@ -102,7 +98,6 @@ inline PartnerDance::PartnerDance(CameraFlowAnalyzer& flow, const rapidjson::Val
       interactionRate(config["interactionRate"].GetDouble()),
       positionFuzz(config["positionFuzz"].GetDouble()),
       separationRadius(config["separationRadius"].GetDouble()),
-      flow(flow),
       timeDeltaRemainder(0)
 {
     reseed(42);
@@ -110,9 +105,6 @@ inline PartnerDance::PartnerDance(CameraFlowAnalyzer& flow, const rapidjson::Val
 
 inline void PartnerDance::reseed(uint32_t seed)
 {
-    flow.capture(1.0);
-    flow.origin();
-
     PRNG prng;
     prng.seed(seed);
 
@@ -176,7 +168,6 @@ inline void PartnerDance::debug(const DebugInfo& d)
     fprintf(stderr, "\t[partner-dance] radius = %f\n", appearance[0].radius);
     fprintf(stderr, "\t[partner-dance] noiseCycle = %f\n", noiseCycle);
     fprintf(stderr, "\t[partner-dance] damping = %f\n", damping);
-    fprintf(stderr, "\t[partner-dance] flow.model = [%f, %f]\n", flow.model[0], flow.model[2]);
     ParticleEffect::debug(d);
 }
 
@@ -188,15 +179,13 @@ inline void PartnerDance::runStep(const FrameInfo &f)
     PRNG prng;
     prng.seed(42);
 
-    flow.capture();
-
     for (unsigned dancer = 0; dancer < numDancers; dancer++) {
         for (unsigned i = 0; i < particlesPerDancer; i++, pa++, pd++) {
 
             prng.remix(pd->position[0] * 1e8);
             prng.remix(pd->position[1] * 1e8);
 
-            Vec2 fPos = pd->position + Vec2(flow.model[0], flow.model[2]) * flowScale;
+            Vec2 fPos = pd->position;
             Vec2 disparity = target - fPos;
             Vec2 normal = Vec2(disparity[1], -disparity[0]);
             Vec2 v = pd->velocity;

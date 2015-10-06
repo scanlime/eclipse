@@ -9,25 +9,20 @@
 #include "narrator.h"
 #include "chaos_particles.h"
 #include "order_particles.h"
-#include "precursor.h"
 #include "rings.h"
 #include "partner_dance.h"
-#include "forest.h"
 #include "darkness.h"
 
 
 int Narrator::script(int st, PRNG &prng)
 {
-    static ChaosParticles chaosA(flow, runner.config["chaosParticles"]);
-    static ChaosParticles chaosB(flow, runner.config["chaosParticles"]);
-    static OrderParticles orderParticles(flow, runner.config["orderParticles"]);
-    static Precursor precursor(flow, runner.config["precursor"]);
-    static RingsEffect ringsA(flow, runner.config["ringsA"]);
-    static RingsEffect ringsB(flow, runner.config["ringsB"]);
-    static RingsEffect ringsC(flow, runner.config["ringsC"]);
-    static PartnerDance partnerDance(flow, runner.config["partnerDance"]);
-    static CameraFlowDebugEffect flowDebugEffect(flow, runner.config["flowDebugEffect"]);
-    static Forest forest(flow, runner.config["forest"]);
+    static ChaosParticles chaosA(runner.config["chaosParticles"]);
+    static ChaosParticles chaosB(runner.config["chaosParticles"]);
+    static OrderParticles orderParticles(runner.config["orderParticles"]);
+    static RingsEffect ringsA(runner.config["ringsA"]);
+    static RingsEffect ringsB(runner.config["ringsB"]);
+    static RingsEffect ringsC(runner.config["ringsC"]);
+    static PartnerDance partnerDance(runner.config["partnerDance"]);
     static DarknessEffect darkness;
 
     rapidjson::Value& config = runner.config["narrator"];
@@ -41,19 +36,6 @@ int Narrator::script(int st, PRNG &prng)
         case 1: {
             // Darkness only ("off")
             crossfade(&darkness, 1);
-            delayForever();
-        }
-
-        case 2: {
-            // Precursor only (sleep mode)            
-            precursor.reseed(prng.uniform32());
-            crossfade(&precursor, 1);
-            delayForever();
-        }
-
-        case 3: {
-            // Debugging the computer vision system
-            crossfade(&flowDebugEffect, 1);
             delayForever();
         }
 
@@ -77,26 +59,11 @@ int Narrator::script(int st, PRNG &prng)
         }
 
         case 10: {
-            // Order trying to form out of the tiniest sparks; runs for an unpredictable time, fails.
-            precursor.reseed(prng.uniform32());
-            crossfade(&precursor, s.value(config["precursorCrossfade"]));
-
-            // Bootstrap
-            delay(s.value(config["precursorBootstrap"]));
-
-            // Wait for darkness
-            while (!precursor.isDone) {
-                doFrame();
-            }
-            return 20;
-        }
-
-        case 20: {
             // Bang. Explosive energy, hints of self-organization
 
             ChaosParticles *pChaosA = &chaosA;
             ChaosParticles *pChaosB = &chaosB;
-            
+
             int bangCount = s.value(config["bangCount"]);
             for (int i = 0; i < bangCount; i++) {
                 pChaosA->reseed(prng.circularVector() * s.value(config["bangSeedRadius"]), prng.uniform32());
@@ -158,16 +125,6 @@ int Narrator::script(int st, PRNG &prng)
             crossfade(&ringsC, s.value(config["ringsC-Crossfade"]));
             attention(s, config["ringsC-Attention"]);
             return 80;
-        }
-
-        case 80: {
-            // Continuous renewal and regrowth. Destruction happens unintentionally,
-            // regrowth is quick and generative. The only way to lose is to stagnate.
-
-            forest.reseed(prng.uniform32());
-            crossfade(&forest, s.value(config["forestCrossfade"]));
-            attention(s, config["forestAttention"]);
-            return 90;
         }
     }
 }

@@ -3,7 +3,6 @@ CPP_FILES = \
 	src/main.cpp \
 	src/narrator.cpp \
 	src/narrator_script.cpp \
-	src/lib/camera_somagic.cpp \
 	src/lib/jpge.cpp \
 	src/lib/lodepng.cpp
 
@@ -13,8 +12,7 @@ UNAME := $(shell uname)
 CPPFLAGS = -O3
 
 # Libraries
-LDFLAGS = -lm -lstdc++ -lusb-1.0
-LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_highgui
+LDFLAGS = -lm -lstdc++ -lusb-1.0 -lftdi
 
 # Debugging
 CPPFLAGS += -g -Wall
@@ -41,7 +39,7 @@ ifeq ($(UNAME), Darwin)
 	LDFLAGS += -L/usr/local/lib
 endif
 
-OBJS := $(CPP_FILES:.cpp=.o) 
+OBJS := $(CPP_FILES:.cpp=.o)
 
 all: $(TARGET)
 

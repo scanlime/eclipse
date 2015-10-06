@@ -20,7 +20,7 @@
 class OrderParticles : public ParticleEffect
 {
 public:
-    OrderParticles(CameraFlowAnalyzer& flow, const rapidjson::Value &config);
+    OrderParticles(const rapidjson::Value &config);
     void reseed(unsigned seed);
 
     virtual void beginFrame(const FrameInfo &f);
@@ -35,10 +35,6 @@ public:
 private:
     unsigned numParticles;
     float centeringGain;
-    float flowFilterRate;
-    float flowScale;
-    float flowLightAngleRate;
-    float flowColorCycleRate;
     float relativeSize;
     float intensity;
     float brightness;
@@ -49,8 +45,6 @@ private:
     float angleGainRate;
     float angleGainCenter;
     float angleGainVariation;
-
-    CameraFlowCapture flow;
 
     unsigned seed;
     float timeDeltaRemainder;
@@ -70,13 +64,10 @@ private:
  *****************************************************************************************/
 
 
-inline OrderParticles::OrderParticles(CameraFlowAnalyzer& flow, const rapidjson::Value &config)
+inline OrderParticles::OrderParticles(const rapidjson::Value &config)
     : palette(config["palette"].GetString()),
       numParticles(config["numParticles"].GetUint()),
       centeringGain(config["centeringGain"].GetDouble()),
-      flowFilterRate(config["flowFilterRate"].GetDouble()),
-      flowScale(config["flowScale"].GetDouble()),
-      flowLightAngleRate(config["flowLightAngleRate"].GetDouble()),
       relativeSize(config["relativeSize"].GetDouble()),
       intensity(config["intensity"].GetDouble()),
       brightness(config["brightness"].GetDouble()),
@@ -87,7 +78,6 @@ inline OrderParticles::OrderParticles(CameraFlowAnalyzer& flow, const rapidjson:
       angleGainRate(config["angleGainRate"].GetDouble()),
       angleGainCenter(config["angleGainCenter"].GetDouble()),
       angleGainVariation(config["angleGainVariation"].GetDouble()),
-      flow(flow),
       timeDeltaRemainder(0)
 {
     reseed(42);
@@ -95,9 +85,6 @@ inline OrderParticles::OrderParticles(CameraFlowAnalyzer& flow, const rapidjson:
 
 inline void OrderParticles::reseed(unsigned seed)
 {
-    flow.capture(1.0);
-    flow.origin();
-
     symmetry = 1000;
     lightAngle = 0;
 
@@ -118,10 +105,7 @@ inline void OrderParticles::reseed(unsigned seed)
 }
 
 inline void OrderParticles::beginFrame(const FrameInfo &f)
-{    
-    flow.capture(flowFilterRate);
-    flow.origin();
-
+{
     float t = f.timeDelta + timeDeltaRemainder;
     int steps = t / stepSize;
     timeDeltaRemainder = t - steps * stepSize;
@@ -130,9 +114,6 @@ inline void OrderParticles::beginFrame(const FrameInfo &f)
     for (unsigned i = 0; i < appearance.size(); i++) {
         appearance[i].intensity = intensity;
         appearance[i].radius = f.modelRadius * relativeSize;
-
-        // Viewpoint adjustment
-        appearance[i].point += flow.model * flowScale;
     }
 
     while (steps > 0) {
@@ -141,8 +122,6 @@ inline void OrderParticles::beginFrame(const FrameInfo &f)
     }
 
     // Lighting
-    colorCycle += flow.model[2] * flowColorCycleRate + f.timeDelta * colorRate;
-    lightAngle += flow.model[0] * flowLightAngleRate;
     lightVec = Vec3(sin(lightAngle), 0, cos(lightAngle));
 
     // Angular speed and direction

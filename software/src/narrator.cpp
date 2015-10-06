@@ -17,7 +17,6 @@ Narrator::Narrator()
 
 void Narrator::setup()
 {
-    flow.setConfig(runner.config["flow"]);
     brightness.set(0.0f, runner.config["brightnessLimit"].GetDouble());
     mixer.setConcurrency(runner.config["concurrency"].GetUint());
     runner.setMaxFrameRate(runner.config["fps"].GetDouble());
@@ -27,7 +26,7 @@ void Narrator::setup()
     if (!logFile) {
         perror("Failed to open narrator log file");
     }
-}    
+}
 
 void Narrator::run()
 {

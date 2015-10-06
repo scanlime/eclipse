@@ -10,7 +10,6 @@
 #pragma once
 
 #include <vector>
-#include "lib/camera_flow.h"
 #include "lib/particle.h"
 #include "lib/prng.h"
 #include "lib/texture.h"
@@ -19,7 +18,7 @@
 class ChaosParticles : public ParticleEffect
 {
 public:
-    ChaosParticles(const CameraFlowAnalyzer &flow, const rapidjson::Value &config);
+    ChaosParticles(const rapidjson::Value &config);
     void reseed(Vec2 location, unsigned seed);
 
     bool isRunning();
@@ -46,9 +45,6 @@ private:
     float colorRate;
     float outsideMargin;
     float darkMultiplier;
-    float flowScaleTarget;
-    float flowScaleRampRate;
-    float flowFilterRate;
 
     struct ParticleDynamics {
         Vec2 position;
@@ -58,14 +54,11 @@ private:
         unsigned age;
     };
 
-    CameraFlowCapture flow;
-
     Texture palette;
     std::vector<ParticleDynamics> dynamics;
     float timeDeltaRemainder;
     float colorCycle;
     float totalIntensity;
-    float flowScale;
     bool running;
 
     void runStep(const FrameInfo &f);
@@ -76,7 +69,7 @@ private:
  *                                   Implementation
  *****************************************************************************************/
 
-inline ChaosParticles::ChaosParticles(const CameraFlowAnalyzer &flow, const rapidjson::Value &config)
+inline ChaosParticles::ChaosParticles(const rapidjson::Value &config)
     : numParticles(config["numParticles"].GetUint()),
       numDarkParticles(config["numDarkParticles"].GetUint()),
       maxAge(config["maxAge"].GetUint()),
@@ -94,10 +87,6 @@ inline ChaosParticles::ChaosParticles(const CameraFlowAnalyzer &flow, const rapi
       colorRate(config["colorRate"].GetDouble()),
       outsideMargin(config["outsideMargin"].GetDouble()),
       darkMultiplier(config["darkMultiplier"].GetDouble()),
-      flowScaleTarget(config["flowScaleTarget"].GetDouble()),
-      flowScaleRampRate(config["flowScaleRampRate"].GetDouble()),
-      flowFilterRate(config["flowFilterRate"].GetDouble()),
-      flow(flow),
       palette(config["palette"].GetString()),
       timeDeltaRemainder(0),
       colorCycle(0)
@@ -119,16 +108,12 @@ inline void ChaosParticles::reseed(Vec2 location, unsigned seed)
 {
     running = true;
     totalIntensity = nanf("");
-    flowScale = 0;
 
     appearance.resize(numParticles);
     dynamics.resize(numParticles);
 
     PRNG prng;
     prng.seed(seed);
-
-    flow.capture(1.0);
-    flow.origin();
 
     colorCycle = prng.uniform(0, M_PI * 2);
 
@@ -143,7 +128,7 @@ inline void ChaosParticles::reseed(Vec2 location, unsigned seed)
 }
 
 inline void ChaosParticles::beginFrame(const FrameInfo &f)
-{    
+{
     if (running) {
         float t = f.timeDelta + timeDeltaRemainder;
         int steps = t / stepSize;
@@ -164,7 +149,6 @@ inline void ChaosParticles::debug(const DebugInfo &di)
 {
     fprintf(stderr, "\t[chaos-particles] running = %d\n", running);
     fprintf(stderr, "\t[chaos-particles] totalIntensity = %f\n", totalIntensity);
-    fprintf(stderr, "\t[chaos-particles] flowScale = %f\n", flowScale);
     ParticleEffect::debug(di);
 }
 
@@ -175,10 +159,6 @@ inline void ChaosParticles::runStep(const FrameInfo &f)
 
     unsigned numLiveParticles = 0;
     float intensityAccumulator = 0;
-
-    // Capture the impulse between the last step and this one
-    flow.capture(flowFilterRate);
-    flowScale = std::min(flowScaleTarget, flowScale + flowScaleRampRate * stepSize);
 
     // Update dynamics
     for (unsigned i = 0; i < dynamics.size(); i++) {
@@ -197,8 +177,7 @@ inline void ChaosParticles::runStep(const FrameInfo &f)
         }
 
         // XZ plane
-        // Horizontal flow -> position
-        pa.point[0] = pd.position[0] - flow.model[0] * flowScale;
+        pa.point[0] = pd.position[0];
         pa.point[2] = pd.position[1];
 
         float ageF = pd.age / (float)maxAge;
