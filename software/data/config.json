@@ -1,0 +1,342 @@
+{
+    "initialState": 0,
+    "concurrency": 3,
+    "fps": 100.0,
+    "brightnessLimit": 0.45,
+
+    "flow": {
+        "debug": false,
+        "debugFrameInterval": 4,
+        "debugVideoFile": "debug-output.avi",
+        "debugVideoFourcc": "XVID",
+        "debugMotionZoom": 20.0,
+
+        "motionLogFile": "flow.log",
+        "motionLogInterval": 1.0,
+
+        "maxPoints": 50,
+        "decimate": 3,
+        "discoveryGridSpacing": 5,
+        "pointTrialPeriod": 2,
+        "maxPointAge": 400,
+        "minPointSpeed": 0.02,
+        "minEigThreshold": 0.0055,
+        "deletePointProbability": 0.02,
+
+        "motionFilterFast": 0.2,
+        "motionFilterSlow": 0.006,
+
+        "transform": [
+            1, 0, 0,
+            0, 0, -1.1,
+            0, 0, 0
+        ]
+    },
+
+    "flowDebugEffect": {
+        "scale": 0.1,
+        "radius": 0.3,
+        "motionLengthScale": 0.7
+    },
+
+    "narrator": {
+
+        "logFile": "narrator.log",
+
+        "opening": {
+            "date": "2014-05-31T21:00:00",
+            "nextState": 20
+        },
+
+        "precursorBootstrap": [15, 20],
+        "precursorCrossfade": [15, 20],
+
+        "bangCount": [1, 4.2],
+        "bangCrossfadeDuration": [0.25, 0.3],
+        "bangDelayBasis": [0.25, 0.35],
+        "bangSeedRadius": 0.25,
+        "bangAttention": {
+            "bootstrap": 1,
+            "initial": 3.5,
+            "brightnessDeltaMin": 1.0,
+            "brightnessAverageMin": 0.1,
+            "rateBaseline": 0.0033,
+            "rateDark": 0.14,
+            "rateStill": 0.05
+        },
+
+        "ringsA-Crossfade": [15, 25],
+        "ringsA-Attention": {
+            "bootstrap": 1,
+            "initial": 1.3,
+            "brightnessDeltaMin": 0.002,
+            "brightnessAverageMin": 0.1,
+            "rateBaseline": [0.006, 0.02],
+            "rateDark": 0.14,
+            "rateStill": 0.05
+        },
+
+        "ringsB-Crossfade": [30, 90],
+        "ringsB-Attention": {
+            "bootstrap": 1,
+            "initial": 1.14,
+            "brightnessDeltaMin": 0.002,
+            "brightnessAverageMin": 0.1,
+            "rateBaseline": [0.004, 0.02],
+            "rateDark": 0.14,
+            "rateStill": 0.05
+        },
+
+        "ringsC-Crossfade": [10, 15],
+        "ringsC-Attention": {
+            "bootstrap": 1,
+            "initial": 1.09,
+            "brightnessDeltaMin": 0.4,
+            "brightnessAverageMin": 0.1,
+            "rateBaseline": [0.004, 0.008],
+            "rateDark": 0.1,
+            "rateStill": 0.1
+        },
+
+        "orderCrossfade": [10, 20],
+        "orderStepAttention": {
+            "bootstrap": 2,
+            "initial": 1.42,
+            "brightnessDeltaMin": 10.0,
+            "brightnessAverageMin": 0.1,
+            "rateBaseline": [0.02, 0.1],
+            "rateDark": 0.14,
+            "rateStill": 0.1
+        },
+
+        "partnerCrossfade": [10, 20],
+        "partnerAttention": {
+            "bootstrap": 4,
+            "initial": 1.34,
+            "brightnessDeltaMin": 0.1,
+            "brightnessAverageMin": 0.1,
+            "rateBaseline": [0.002, 0.03],
+            "rateDark": 0.09,
+            "rateStill": 0.09
+        },
+
+        "forestCrossfade": [10, 20],
+        "forestAttention": {
+            "bootstrap": 4,
+            "initial": 2.64,
+            "brightnessDeltaMin": 1.0,
+            "brightnessAverageMin": 0.1,
+            "rateBaseline": [0.007, 0.02],
+            "rateDark": 0.08,
+            "rateStill": 0.08
+        }
+    },
+
+    "precursor": {
+        "palette": "data/darkmatter-palette.png",
+
+        "flowScale": 0.000018,
+        "flowFilterRate": 0.3,
+
+        "noiseRate": 0.0002,
+        "noiseScale": 0.0025,
+        "noiseDepth": 10.0,
+
+        "brightness": 5.0,
+
+        "darknessDurationMin": 3.0,
+        "darknessDurationMax": 4.0,
+        "darknessThreshold": 0.18,
+
+        "treeGrowth": {
+            "maxParticles": 300,
+            "flowLaunchScale": 0.17,
+            "flowLaunchSpeed": 0.04,
+            "launchProbability": 0.012,
+            "launchPointNoise": 0.019,
+            "launchVelocityNoise": 0.0017,
+            "launchHistoryDepth": 12,
+            "stepRate": 200.0,
+            "brightness": 0.3,
+            "particleDuration": 2.4,
+            "particleRampup": 0.06,
+            "gradientPull": -0.000016,
+            "ledPull": -0.000007,
+            "ledPullRadius": 0.27,
+            "blockPull": -0.00003,
+            "blockPullRadius": 0.11,
+            "damping": 0.009,
+            "visibleRadius": 0.22,
+            "outsideMargin": 2.0,
+            "flowFilterRate": 0.2,
+            "spuriousLaunchProbabilityInitial": 0.015,
+            "spuriousLaunchProbabilityRate": -0.000005,
+            "spuriousLaunchRadiusMin": 0.2,
+            "spuriousLaunchRadiusMax": 0.8,
+            "spuriousLaunchSpeedMin": 0.0001,
+            "spuriousLaunchSpeedMax": 0.0004
+        }
+    },
+
+    "chaosParticles": {
+        "palette": "data/bang-palette.png",
+        "numParticles": 250,
+        "numDarkParticles": 30,
+        "maxAge": 9000,
+        "generationScale": 0.071,
+        "speedMin": 0.97,
+        "speedMax": 1.3,
+        "spinMin": 1.0471,
+        "spinMax": 1.0473,
+        "relativeSize": 0.32,
+        "intensity": 2.0,
+        "intensityExp": 0.4,
+        "initialSpeedMin": 0.0001,
+        "initialSpeedMax": 0.009,
+        "stepSize": 0.005,
+        "colorRate": 0.02,
+        "outsideMargin": 5.0,
+        "darkMultiplier": -2.0,
+        "flowFilterRate": 0.02,
+        "flowScaleTarget": 0.025,
+        "flowScaleRampRate": 0.0015
+    },
+
+    "orderParticles": {
+        "palette": "data/mars-palette.png",
+        "numParticles": 40,
+        "centeringGain": 0.002,
+        "flowFilterRate": 0.1,
+        "flowScale": 0.03,
+        "flowLightAngleRate": 0.03,
+        "flowColorCycleRate": 0.002,
+        "relativeSize": 0.42,
+        "intensity": 0.2,
+        "brightness": 4.0,
+        "stepSize": 0.01,
+        "seedRadius": 1.9,
+        "interactionSize": 0.55,
+        "colorRate": 0.035,
+        "angleGainRate": 5.0,
+        "angleGainCenter": 0.055,
+        "angleGainVariation": 0.035
+    },
+
+    "partnerDance": {
+        "palette": "data/foggy-bay-palette.png",
+        "particlesPerDancer": 60,
+        "stepSize": 0.01,
+        "noiseRate": 0.4,
+        "radius": 0.73,
+        "radiusScale": 0.4,
+        "intensityScale": 20.0,
+        "maxIntensity": 0.15,
+        "minIntensity": 0.01,
+        "targetRadius": 0.5,
+        "interactionRadius": 0.2,
+        "jitterRate": 0.35,
+        "jitterStrength": 0.9,
+        "jitterScale": 0.5,
+        "flowScale": -0.03,
+        "brightness": 4.0,
+        "targetGain": 0.00008,
+        "dampingRate": 0.0001,
+        "initialDamping": 0.003,
+        "targetSpin": 0.000035,
+        "interactionRate": 0.0003,
+        "positionFuzz": 4.0,
+        "separationRadius": 3.0
+    },
+
+    "ringsA": {
+        "palette": "data/glass.png",
+        "xyzSpeed": 0.2,
+        "xyzScale": 0.3,
+        "flowScale": 0.004,
+        "wSpeed": 0.1,
+        "wRate": 0.015,
+        "ringScale": 1.5,
+        "ringScaleRate": 0.035,
+        "ringDepth": 0.4,
+        "wanderSpeed": 0.04,
+        "wanderSize": 1.5,
+        "brightnessContrast": 4.0,
+        "colorContrast": 0.8,
+        "colorShiftRate": 0.12,
+        "targetBrightness": 0.15,
+        "thresholdGain": 0.1,
+        "thresholdStepLimit": 0.02,
+        "initialThreshold": -1.0,
+        "brightnessOctaves": 7,
+        "colorOctaves": 3
+    },
+
+    "ringsB": {
+        "palette": "data/darkmatter-palette.png",
+        "xyzSpeed": 0.2,
+        "xyzScale": 0.3,
+        "flowScale": 0.0035,
+        "wSpeed": 0.15,
+        "wRate": 0.015,
+        "ringScale": 1.5,
+        "ringScaleRate": 0.035,
+        "ringDepth": 0.4,
+        "wanderSpeed": 0.015,
+        "wanderSize": 1.5,
+        "brightnessContrast": 7.0,
+        "colorContrast": 0.8,
+        "colorShiftRate": 0.12,
+        "targetBrightness": 0.08,
+        "thresholdGain": 0.1,
+        "thresholdStepLimit": 0.02,
+        "initialThreshold": -1.0,
+        "brightnessOctaves": 7,
+        "colorOctaves": 3
+    },
+
+    "ringsC": {
+        "palette": "data/ybca-city-lights-palette.png",
+        "xyzSpeed": 0.2,
+        "xyzScale": 0.6,
+        "flowScale": 0.0035,
+        "wSpeed": 0.30,
+        "wRate": 0.015,
+        "ringScale": 1.5,
+        "ringScaleRate":
+         0.035,
+        "ringDepth": 0.9,
+        "wanderSpeed": 0.015,
+        "wanderSize": 1.5,
+        "brightnessContrast": 1.6,
+        "colorContrast": 0.8,
+        "colorShiftRate": 0.004,
+        "targetBrightness": 0.2,
+        "thresholdGain": 0.1,
+        "thresholdStepLimit": 0.02,
+        "initialThreshold": -1.0,
+        "brightnessOctaves": 7,
+        "colorOctaves": 3
+    },
+
+    "forest": {
+        "palette": "data/evergreen.png",
+        "maxParticles": 800,
+        "outsideMargin": 5.0,
+        "flowScale": -0.09,
+        "flowFilterRate": 0.02,
+        "radius": [0.35, 0.48],
+        "intensity": 0.14,
+        "historyDepth": 15,
+        "newnessBias": 0.2,
+        "newDirection": [0, 0, 0.08],
+        "deltaDirection": [ [-0.2, 0.2], 0, [-0.003, 0.003] ],
+        "newPoint": [ [-0.9, 0.9], 0, -1.9],
+        "newTexCoord": [ [0.2, 0.8], [0.2, 0.8] ],
+        "walkTexCoord": 0.3,
+        "deltaTexCoord": 0.02,
+        "maxIntensity": 1.0,
+        "intensityRate": 4.0,
+        "travelRate": [ [-0.5, 0.5], 0, [-0.1, -0.02]],
+        "growthPointsPerSecond": 200
+    }
+}
