@@ -32,8 +32,9 @@
 
 #pragma once
 #include <stdint.h>
-#include <tinythread.h>
+#include "lib/tinythread.h"
 extern "C" {
+    #include <ftdi.h>
     #include <mpsse.h>
 }
 
@@ -41,16 +42,15 @@ extern "C" {
 class MultiDAC
 {
 public:
-    static const unsigned kNumChannels = 9;      // Supports up to 14 with this scheme
+    static const unsigned kNumChannels = 9;      // Supports up to 14 with this scheme. Lower numbers save some CPU.
+    static const unsigned kBitsPerSample = 24;   // The DAC supports 16, 24 or 32 bits
+    static const unsigned kSampleRate = 48000;   // The sample rate and bits per sample must match the clock generator setup
 
-    static const unsigned kBitsPerSample = 24;   // Must match DAC and clock generator setup
-    static const unsigned kSampleRate = 48000;
-
-    struct Sample {
+    struct Frame {
         int32_t ch[kNumChannels];
     };
 
-    typedef void (*Callback_t)(Sample *buffer, unsigned num_samples, void *userdata);
+    typedef void (*Callback_t)(Frame *buffer, unsigned num_frames, void *userdata);
 
     // Starts the audio thread, which initializes the device then begins invoking the callback.
     // Returns false on error.
@@ -61,17 +61,24 @@ private:
     static const unsigned kUSBVendorId = 0xe461;
     static const unsigned kUSBProductId = 0x0015;
 
-    // USB buffers. Enough for a few USB frames.
-    static const unsigned kBytesPerBuffer = 1024;
+    static const unsigned kAudioFramesPerBuffer = 64;
+    static const unsigned kBytesPerBuffer = kAudioFramesPerBuffer * kBitsPerSample * 2;
     static const unsigned kNumBuffers = 4;
 
     Callback_t callback;
     void *callback_data;
+    tthread::thread *thread;
+    struct ftdi_context *ftdi;
 
     struct {
-        ftdi_transfer_control *tc;
+        struct ftdi_transfer_control *tc;
         uint8_t data[kBytesPerBuffer];
     } buffers[kNumBuffers];
+
+    Frame mix_buffer[kAudioFramesPerBuffer];
+
+    static void threadFunc(void *arg);
+    void submitBuffer(unsigned n);
 };
 
 
@@ -138,18 +145,51 @@ inline bool MultiDAC::start(Callback_t fn, void *userdata)
     // Open the device here in case it errors, then move to another thread where we'll
     // continuously pump buffers full of formatted audio data into the FIFO.
 
-    struct ftdi_context *ftdi = ftdi_new();
+    ftdi = ftdi_new();
     if (ftdi_usb_open(ftdi, kUSBVendorId, kUSBProductId) < 0) {
         fprintf(stderr, "Failed to reopen MultiDAC after clock init: %s", ftdi_get_error_string(ftdi));
         return false;
     }
 
-
-
-unsigned char block[512];
-for (int i = 0; i < sizeof block; i++)
- block[i] = (i&1) ? 0xFF : 0x00;
-while (ftdi_write_data(ftdi, block, sizeof block) > 0);
-
+    memset(buffers, 0, sizeof buffers);
+    thread = new tthread::thread(threadFunc, this);
     return true;
+}
+
+inline void MultiDAC::threadFunc(void *arg)
+{
+    MultiDAC *self = static_cast<MultiDAC*>(arg);
+    while (1) {
+        for (unsigned i = 0; i < kNumBuffers; i++) {
+            self->submitBuffer(i);
+        }
+    }
+}
+
+inline void MultiDAC::submitBuffer(unsigned n)
+{
+    // Wait for the buffer in this slot to complete, if necessary.
+    if (buffers[n].tc) {
+        ftdi_transfer_data_done(buffers[n].tc);
+        buffers[n].tc = 0;
+    }
+
+    callback(mix_buffer, kAudioFramesPerBuffer, callback_data);
+
+    // Assemble the I2S waveform
+    uint8_t *dest = buffers[n].data;
+    for (unsigned frame = 0; frame < kAudioFramesPerBuffer; frame++) {
+        for (unsigned lrck = 0; lrck < 2; lrck++) {
+            for (unsigned bit = 0; bit < kBitsPerSample; bit++) {
+                uint8_t byte = lrck << 7;
+                for (unsigned channel = lrck; channel < kNumChannels; channel += 2) {
+                    int32_t pcm = mix_buffer[frame].ch[channel];
+                    byte |= ((pcm >> (kBitsPerSample - 1 - bit)) & 1) << (channel >> 1);
+                }
+                *(dest++) = byte;
+            }
+        }
+    }
+
+    buffers[n].tc = ftdi_write_data_submit(ftdi, buffers[n].data, kBytesPerBuffer);
 }

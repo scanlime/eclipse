@@ -1,3 +1,4 @@
+#include <math.h>
 #include "narrator.h"
 #include "eclsensor.h"
 #include "multidac.h"
@@ -8,9 +9,21 @@ static EclSensor sensor;
 static MultiDAC multidac;
 
 
-static void dac_callback(MultiDAC::Sample *buffer, unsigned num_samples, void *userdata)
+static void dac_callback(MultiDAC::Frame *buffer, unsigned num_frames, void *userdata)
 {
-    printf("cb!\n");
+    static unsigned clk = 0;
+
+    // quick and dirty multichannel square wave generator
+
+    for (unsigned frame = 0; frame < num_frames; frame++) {
+        clk++;
+        for (unsigned channel = 0; channel < MultiDAC::kNumChannels; channel++) {
+            double hz = 400 + channel * 50;
+            double phase = fmod(hz * clk / MultiDAC::kSampleRate, 1.0);
+            int pcm = phase > .5 ? 1<<20 : -1<<20;
+            buffer[frame].ch[channel] = pcm;
+        }
+    }
 }
 
 
@@ -20,7 +33,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    return 0;
+    // xxx
+    while (1) sleep (1);
 
 	if (!sensor.init("data/eclsensor.rbf", "/dev/ttyAMA0")) {
 		return 1;
