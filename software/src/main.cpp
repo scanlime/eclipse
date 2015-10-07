@@ -1,17 +1,30 @@
 #include "narrator.h"
 #include "eclsensor.h"
+#include "multidac.h"
 
 //static Narrator narrator;
 
 static EclSensor sensor;
+static MultiDAC multidac;
+
+
+static void dac_callback(MultiDAC::Sample *buffer, unsigned num_samples, void *userdata)
+{
+    printf("cb!\n");
+}
 
 
 int main(int argc, char **argv)
 {
+    if (!multidac.start(dac_callback, 0)) {
+        return 1;
+    }
+
+    return 0;
+
 	if (!sensor.init("data/eclsensor.rbf", "/dev/ttyAMA0")) {
 		return 1;
 	}
-
 
     while (1) {
         usleep(1);
