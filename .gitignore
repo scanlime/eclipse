@@ -1,6 +1,7 @@
 .DS_Store
 sensor-fpga/db/
 sensor-fpga/incremental_db/
+._*
 *.b#*
 *.s#*
 *.3dmbak
