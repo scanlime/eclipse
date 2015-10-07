@@ -2,35 +2,28 @@
 #include "narrator.h"
 #include "eclsensor.h"
 #include "multidac.h"
+#include "loopmixer.h"
 
 //static Narrator narrator;
 
 static EclSensor sensor;
 static MultiDAC multidac;
-
-
-static void dac_callback(MultiDAC::Frame *buffer, unsigned num_frames, void *userdata)
-{
-    static unsigned clk = 0;
-
-    // quick and dirty multichannel square wave generator
-
-    for (unsigned frame = 0; frame < num_frames; frame++) {
-        clk++;
-        for (unsigned channel = 0; channel < MultiDAC::kNumChannels; channel++) {
-            double hz = 400 + channel * 50;
-            double phase = fmod(hz * clk / MultiDAC::kSampleRate, 1.0);
-            int pcm = phase > .5 ? 1<<20 : -1<<20;
-            buffer[frame].ch[channel] = pcm;
-        }
-    }
-}
+static LoopMixer mixer;
 
 
 int main(int argc, char **argv)
 {
-    if (!multidac.start(dac_callback, 0)) {
+    if (!mixer.start(multidac)) {
         return 1;
+    }
+
+    mixer.master_gain = decibel(-25.);
+
+    mixer.load(0, "data/progression Loop Drone.wav");
+    mixer.tracks[0].track_gain = 1.;
+    for (int n = 0; n < 9; n++) {
+        mixer.tracks[0].l_gains[n] = 1.;
+        mixer.tracks[0].r_gains[n] = 1.;
     }
 
     // xxx
