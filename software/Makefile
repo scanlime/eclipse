@@ -12,7 +12,7 @@ UNAME := $(shell uname)
 CPPFLAGS = -O3
 
 # Libraries
-LDFLAGS = -lm -lstdc++ -lusb-1.0 -lftdi
+LDFLAGS = -lm -lstdc++ -lusb-1.0 /usr/lib/libftdi.so.2 /usr/lib/libmpsse.a
 
 # Debugging
 CPPFLAGS += -g -Wall

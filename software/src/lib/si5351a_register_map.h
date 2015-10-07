@@ -4,7 +4,7 @@
 //**************************************************
 //C-Code File version = 1
 //#BEGIN_HEADER
-//Date = Tuesday, October 06, 2015 10:43 AM
+//Date = Tuesday, October 06, 2015 5:04 PM
 //File version = 3
 //Software Name = Si5351 ClockBuilder Desktop
 //Software version = 6.5
@@ -43,8 +43,6 @@
 # Disable State = Low
 # Clock Source = b11
 #Channel 1
-# Powered = Off
-#Channel 2
 # Output Frequency (MHz) = 2.304000000
 # Multisynth Output Frequency (MHz) = 2.304000000
 # Multisynth Divider = 348
@@ -57,6 +55,8 @@
 # Drive Strength = b11
 # Disable State = Low
 # Clock Source = b11
+#Channel 2
+# Powered = Off
 #Channel 3
 # Powered = Off
 #Channel 4
@@ -80,8 +80,8 @@ typedef struct Reg_Data{
 Reg_Data const code Reg_Store[NUM_REGS_MAX] = {
 { 15,0x00},
 { 16,0x4F},
-{ 17,0x80},
-{ 18,0x4F},
+{ 17,0x4F},
+{ 18,0x83},
 { 19,0x80},
 { 20,0x80},
 { 21,0x80},
@@ -114,17 +114,17 @@ Reg_Data const code Reg_Store[NUM_REGS_MAX] = {
 { 48,0x00},
 { 49,0x00},
 { 50,0x00},
-{ 51,0x00},
+{ 51,0x01},
 { 52,0x00},
-{ 53,0x00},
+{ 53,0xAC},
 { 54,0x00},
 { 55,0x00},
 { 56,0x00},
 { 57,0x00},
 { 58,0x00},
-{ 59,0x01},
+{ 59,0x00},
 { 60,0x00},
-{ 61,0xAC},
+{ 61,0x00},
 { 62,0x00},
 { 63,0x00},
 { 64,0x00},
