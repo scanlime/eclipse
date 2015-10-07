@@ -17,7 +17,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    mixer.master_gain = decibel(-19.);
+    mixer.master_gain = decibel(-25.);
 
     mixer.load(0, "data/progression Loop Drone.wav");
     mixer.tracks[0].track_gain = 1.;
