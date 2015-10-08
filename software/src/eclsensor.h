@@ -44,7 +44,7 @@ public:
     static const unsigned kRxCount = 20;
     static const unsigned kRxTimerNybbles = 4;
 
-    static const int kNumRetries = 10;
+    static const int kNumRetries = 3;
     static const int kPacketTimeoutMillisec = 100;
 
     struct Packet {
@@ -105,7 +105,8 @@ inline bool EclSensor::init(const char *rbf_path, const char *serial_path)
     options.c_cc[VMIN] = 0;
     options.c_cc[VTIME] = 0;
 
-    for (int tries = 0; tries <= kNumRetries; tries++) {
+    int retries = kNumRetries;
+    while (1) {
 
         // Start out assuming the FPGA is configured.
         // It sends back data at 921600 baud (wow, such fast)
@@ -140,7 +141,14 @@ inline bool EclSensor::init(const char *rbf_path, const char *serial_path)
                           (now.tv_usec - start_time.tv_usec) / 1000;
             if (millis >= kPacketTimeoutMillisec) {
                 fprintf(stderr, "timeout\n");
-                break;
+
+                if (retries > 0) {
+                    retries--;
+                    break;
+                } else {
+                    fprintf(stderr, "Out of retries, failed to set up sensor FPGA\n");
+                    return false;
+                }
             }
         }
 
@@ -206,11 +214,8 @@ inline bool EclSensor::init(const char *rbf_path, const char *serial_path)
         tcdrain(serial_fd);
         fprintf(stderr, "done\n");
 
-        // Try again...
+        // Try it...
     }
-
-    // Out of tries
-    return false;
 }
 
 inline const EclSensor::Packet* EclSensor::poll()

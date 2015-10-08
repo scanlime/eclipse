@@ -4,8 +4,7 @@
 #include "multidac.h"
 #include "loopmixer.h"
 
-//static Narrator narrator;
-
+static Narrator narrator;
 static EclSensor sensor;
 static MultiDAC multidac;
 static LoopMixer mixer;
@@ -13,7 +12,8 @@ static LoopMixer mixer;
 
 int main(int argc, char **argv)
 {
-    if (!mixer.start(multidac)) {
+    narrator.runner.setLayout("layouts/grid32x16z.json");
+    if (!narrator.runner.parseArguments(argc, argv)) {
         return 1;
     }
 
@@ -26,36 +26,27 @@ int main(int argc, char **argv)
         mixer.tracks[0].r_gains[n] = 1.;
     }
 
-    // xxx
-    while (1) sleep (1);
+    narrator.setup();
+    mixer.start(multidac);
+    sensor.init("data/eclsensor.rbf", "/dev/ttyAMA0");
 
-	if (!sensor.init("data/eclsensor.rbf", "/dev/ttyAMA0")) {
-		return 1;
-	}
-
-    while (1) {
-        usleep(1);
-        const EclSensor::Packet *p = sensor.poll();
-        if (p) {
-            if (p->tx_id == 0) {
-                // Home cursor
-                printf("\e[H");
-            }
-            printf("Tx %2d :", p->tx_id);
-            for (unsigned i = 0; i < EclSensor::kRxCount; i++) {
-                printf(" %5d", p->rx_timers[i]);
-            }
-            printf("\n");
-        }
-    }
-
-    // narrator.runner.setLayout("layouts/strip64.json");
-    // if (!narrator.runner.parseArguments(argc, argv)) {
-    //     return 1;
+    // while (1) {
+    //     usleep(1);
+    //     const EclSensor::Packet *p = sensor.poll();
+    //     if (p) {
+    //         if (p->tx_id == 0) {
+    //             // Home cursor
+    //             printf("\e[H");
+    //         }
+    //         printf("Tx %2d :", p->tx_id);
+    //         for (unsigned i = 0; i < EclSensor::kRxCount; i++) {
+    //             printf(" %5d", p->rx_timers[i]);
+    //         }
+    //         printf("\n");
+    //     }
     // }
 
-    // narrator.setup();
-    // narrator.run();
+    narrator.run();
 
     return 0;
 }
