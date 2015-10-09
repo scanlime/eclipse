@@ -80,10 +80,8 @@ EffectRunner::FrameStatus Narrator::doFrame()
 {
     // xxx: Temporary display for sensor state
     if (sensor) {
-        const EclSensor::Packet *p, *last = 0;
-        while ((p = sensor->poll())) { last = p; }
-        if ((p = last)) {
-            // Show the latest frame
+        const EclSensor::Packet *p;
+        while ((p = sensor->poll())) {
             if (p->tx_id == 0) {
                 // Home cursor
                 printf("\e[H");
