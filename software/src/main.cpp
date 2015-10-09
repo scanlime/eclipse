@@ -20,32 +20,31 @@ int main(int argc, char **argv)
     mixer.master_gain = decibel(-25.);
 
     mixer.load(0, "data/progression Loop Drone.wav");
+    mixer.load(1, "data/progression Air.wav");
+    mixer.load(2, "data/progression Drums.wav");
+    mixer.load(3, "data/progression Mini Strings.wav");
+    mixer.load(4, "data/progression Glass.wav");
+    mixer.load(5, "data/progression GlassWarp.wav");
+
     mixer.tracks[0].track_gain = 1.;
     for (int n = 0; n < 9; n++) {
-        mixer.tracks[0].l_gains[n] = 1.;
-        mixer.tracks[0].r_gains[n] = 1.;
+        mixer.tracks[0].l_gains[n] = (n & 1);
+        mixer.tracks[0].r_gains[n] = !(n & 1);
+    }
+
+    mixer.tracks[4].track_gain = decibel(-6);
+    mixer.tracks[4].l_gains[3] = 1.f;
+
+    mixer.tracks[2].track_gain = decibel(-15);
+    for (int n = 0; n < 9; n++) {
+        mixer.tracks[2].l_gains[n] = (n & 1);
+        mixer.tracks[2].r_gains[n] = !(n & 1);
     }
 
     narrator.setup();
     mixer.start(multidac);
     sensor.init("data/eclsensor.rbf", "/dev/ttyAMA0");
-
-    // while (1) {
-    //     usleep(1);
-    //     const EclSensor::Packet *p = sensor.poll();
-    //     if (p) {
-    //         if (p->tx_id == 0) {
-    //             // Home cursor
-    //             printf("\e[H");
-    //         }
-    //         printf("Tx %2d :", p->tx_id);
-    //         for (unsigned i = 0; i < EclSensor::kRxCount; i++) {
-    //             printf(" %5d", p->rx_timers[i]);
-    //         }
-    //         printf("\n");
-    //     }
-    // }
-
+    narrator.useSensor(sensor);
     narrator.run();
 
     return 0;

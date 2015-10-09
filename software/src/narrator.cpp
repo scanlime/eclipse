@@ -10,7 +10,7 @@
 
 
 Narrator::Narrator()
-    : brightness(mixer)
+    : brightness(mixer), sensor(0)
 {
     runner.setEffect(&brightness);
 }
@@ -26,6 +26,11 @@ void Narrator::setup()
     if (!logFile) {
         perror("Failed to open narrator log file");
     }
+}
+
+void Narrator::useSensor(EclSensor &s)
+{
+    sensor = &s;
 }
 
 void Narrator::run()
@@ -73,6 +78,24 @@ void Narrator::endCycle()
 
 EffectRunner::FrameStatus Narrator::doFrame()
 {
+    // xxx: Temporary display for sensor state
+    if (sensor) {
+        const EclSensor::Packet *p, *last = 0;
+        while ((p = sensor->poll())) { last = p; }
+        if ((p = last)) {
+            // Show the latest frame
+            if (p->tx_id == 0) {
+                // Home cursor
+                printf("\e[H");
+            }
+            printf("Tx %2d :", p->tx_id);
+            for (unsigned i = 0; i < EclSensor::kRxCount; i++) {
+                printf(" %5d", p->rx_timers[i]);
+            }
+            printf("\n");
+        }
+    }
+
     EffectRunner::FrameStatus st = runner.doFrame();
 
     totalTime += st.timeDelta;

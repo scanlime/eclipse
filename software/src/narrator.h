@@ -16,6 +16,7 @@
 #include "lib/prng.h"
 #include "lib/sampler.h"
 #include "lib/brightness.h"
+#include "eclsensor.h"
 
 
 class Narrator
@@ -42,6 +43,8 @@ public:
     void setup();
     void run();
 
+    void useSensor(EclSensor &s);
+
     NEffectRunner runner;
     EffectMixer mixer;
     Brightness brightness;
@@ -65,4 +68,6 @@ private:
     double totalTime;
     std::map<int, double> singleStateTime;
     int currentState;
+
+    EclSensor *sensor;
 };
