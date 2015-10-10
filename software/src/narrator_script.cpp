@@ -30,29 +30,6 @@ int Narrator::script(int st, PRNG &prng)
 
     switch (st) {
 
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        // Special states
-
-        case 1: {
-            // Darkness only ("off")
-            crossfade(&darkness, 1);
-            delayForever();
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        // Opening sequence
-
-        case 0: {
-            // Darkness until opening
-
-            crossfade(&darkness, 1);
-            delayUntilDate(config["opening"]["date"]);
-            return config["opening"]["nextState"].GetInt();
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        // Cyclic states
-
         default: {
             endCycle();
             return 10;

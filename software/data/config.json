@@ -4,49 +4,41 @@
     "fps": 100.0,
     "brightnessLimit": 0.45,
 
-    "flow": {
-        "debug": false,
-        "debugFrameInterval": 4,
-        "debugVideoFile": "debug-output.avi",
-        "debugVideoFourcc": "XVID",
-        "debugMotionZoom": 20.0,
+    "mixer": {
 
-        "motionLogFile": "flow.log",
-        "motionLogInterval": 1.0,
+        "master_level": -20,
 
-        "maxPoints": 50,
-        "decimate": 3,
-        "discoveryGridSpacing": 5,
-        "pointTrialPeriod": 2,
-        "maxPointAge": 400,
-        "minPointSpeed": 0.02,
-        "minEigThreshold": 0.0055,
-        "deletePointProbability": 0.02,
-
-        "motionFilterFast": 0.2,
-        "motionFilterSlow": 0.006,
-
-        "transform": [
-            1, 0, 0,
-            0, 0, -1.1,
-            0, 0, 0
+        "tracks": [
+            {
+                "file": "data/progression Loop Drone.wav",
+                "level": 0
+            },
+            {
+                "file": "data/progression Air.wav",
+                "level": -7
+            },
+            {
+                "file": "data/progression Drums.wav",
+                "level": -10
+            },
+            {
+                "file": "data/progression Mini Strings.wav",
+                "level": -9
+            },
+            {
+                "file": "data/progression Glass.wav",
+                "level": -7
+            },
+            {
+                "file": "data/progression GlassWarp.wav",
+                "level": -9
+            }
         ]
-    },
-
-    "flowDebugEffect": {
-        "scale": 0.1,
-        "radius": 0.3,
-        "motionLengthScale": 0.7
     },
 
     "narrator": {
 
         "logFile": "narrator.log",
-
-        "opening": {
-            "date": "2014-05-31T21:00:00",
-            "nextState": 20
-        },
 
         "precursorBootstrap": [15, 20],
         "precursorCrossfade": [15, 20],

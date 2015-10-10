@@ -53,7 +53,7 @@ void Narrator::endCycle()
     if (logFile) {
         time_t now = time(NULL);
         char timeBuffer[256];
-        ctime_r(&now, timeBuffer);        
+        ctime_r(&now, timeBuffer);
 
         fprintf(logFile, "\n------ Summary : %s", timeBuffer);
         fprintf(logFile, "      loop total ");

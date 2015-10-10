@@ -30,6 +30,8 @@
 #pragma once
 #include <math.h>
 #include "multidac.h"
+#include "lib/rapidjson/rapidjson.h"
+#include "lib/rapidjson/document.h"
 
 
 inline float decibel(float db) {
@@ -59,6 +61,8 @@ public:
 
     LoopMixer();
     bool start(MultiDAC &multidac);
+
+    void configure(const rapidjson::Value& config);
 
     // Warning, doesn't read the WAV header.
     // The file must be n a canonical format, with
@@ -114,6 +118,28 @@ inline bool LoopMixer::load(unsigned index, const char *filename)
         loop_length = tracks[index].sample_count;
     }
     return true;
+}
+
+inline void LoopMixer::configure(const rapidjson::Value& config)
+{
+    master_gain = decibel(config["master_level"].GetDouble());
+    const rapidjson::Value& trackList = config["tracks"];
+
+    for (unsigned i = 0; i < trackList.Size(); i++) {
+        const rapidjson::Value& track = trackList[i];
+
+        const char *file = track["file"].GetString();
+        printf("Mixer track %d: %s\n", i, file);
+        load(i, file);
+
+        tracks[i].track_gain = decibel(track["level"].GetDouble());
+
+        // xxx temporary channel mapping
+        for (int n = 0; n < 9; n++) {
+            tracks[i].l_gains[n] = n<5;
+            tracks[i].r_gains[n] = n>=5;
+        }
+    }
 }
 
 inline void LoopMixer::callback(MultiDAC::Frame *buffer, unsigned num_frames, void *userdata)
