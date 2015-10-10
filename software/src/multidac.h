@@ -63,7 +63,7 @@ private:
 
     static const unsigned kAudioFramesPerBuffer = 64;
     static const unsigned kBytesPerBuffer = kAudioFramesPerBuffer * kBitsPerSample * 2;
-    static const unsigned kNumBuffers = 4;
+    static const unsigned kNumBuffers = 16;
 
     Callback_t callback;
     void *callback_data;
