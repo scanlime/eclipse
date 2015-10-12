@@ -6,15 +6,15 @@
 
     "mixer": {
 
-        "master_level": -23,
+        "master_level": -18,
 
         "tracks": [
-            { "file": "data/progression Loop Drone.wav",    "level": 0   },
-            { "file": "data/progression Air.wav",           "level": -12 },
-            { "file": "data/progression Drums.wav",         "level": -10 },
-            { "file": "data/progression Mini Strings.wav",  "level": -9  },
-            { "file": "data/progression Glass.wav",         "level": 0  },
-            { "file": "data/progression GlassWarp.wav",     "level": -9  }
+            { "file": "data/progression Loop Drone.wav",    "chance": 1,     "min_level": -2,   "max_level": 0     },
+            { "file": "data/progression Air.wav",           "chance": 0.1,   "min_level": -12,  "max_level": -10   },
+            { "file": "data/progression Drums.wav",         "chance": 0.4,   "min_level": -12,  "max_level": -9    },
+            { "file": "data/progression Mini Strings.wav",  "chance": 0.2,   "min_level": -8,   "max_level": -6    },
+            { "file": "data/progression Glass.wav",         "chance": 0.5,   "min_level": -4,   "max_level": -6    },
+            { "file": "data/progression GlassWarp.wav",     "chance": 0.5,   "min_level": -7,   "max_level": -9    }
         ]
     },
 

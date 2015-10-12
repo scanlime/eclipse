@@ -32,6 +32,7 @@
 #include "multidac.h"
 #include "lib/rapidjson/rapidjson.h"
 #include "lib/rapidjson/document.h"
+#include "lib/prng.h"
 
 
 inline float decibel(float db) {
@@ -55,6 +56,11 @@ public:
         float r_gains[kNumChannels];
         int16_t *samples;
         unsigned sample_count;
+
+        // Inputs for resetLoop()
+        float chance;
+        float min_level;
+        float max_level;
     };
 
     Track tracks[kMaxTracks];
@@ -71,6 +77,9 @@ public:
 
 private:
     static void callback(MultiDAC::Frame *buffer, unsigned num_frames, void *userdata);
+    void resetLoop();
+
+    PRNG prng;
 };
 
 
@@ -84,6 +93,7 @@ inline LoopMixer::LoopMixer()
     master_gain = 0.f;
     sample_number = 0;
     loop_length = 0;
+    prng.seed(time(NULL));
     memset(tracks, 0, sizeof tracks);
 }
 
@@ -132,55 +142,81 @@ inline void LoopMixer::configure(const rapidjson::Value& config)
         printf("Mixer track %d: %s\n", i, file);
         load(i, file);
 
-        tracks[i].track_gain = decibel(track["level"].GetDouble());
+        tracks[i].chance = track["chance"].GetDouble();
+        tracks[i].min_level = track["min_level"].GetDouble();
+        tracks[i].max_level = track["max_level"].GetDouble();
 
-        // xxx temporary channel mapping
-        for (int n = 0; n < 9; n++) {
-            tracks[i].l_gains[n] = n<5;
-            tracks[i].r_gains[n] = n>=5;
+        // xxx temporary channel mapping?
+        for (unsigned n = 0; n < kNumChannels; n++) {
+            bool split = ((n + i) % kNumChannels) <= (kNumChannels / 2);
+            tracks[i].l_gains[n] = split ? 1.0f : 0.0f;
+            tracks[i].r_gains[n] = split ? 0.0f : 1.0f;
+        }
+    }
+
+    resetLoop();
+}
+
+inline void LoopMixer::resetLoop()
+{
+    for (unsigned t = 0; t < kMaxTracks; t++) {
+        if (prng.uniform() < tracks[t].chance) {
+            tracks[t].track_gain = decibel(prng.uniform(tracks[t].min_level, tracks[t].max_level));
+        } else {
+            tracks[t].track_gain = 0;
         }
     }
 }
+
 
 inline void LoopMixer::callback(MultiDAC::Frame *buffer, unsigned num_frames, void *userdata)
 {
     LoopMixer *self = static_cast<LoopMixer*>(userdata);
 
-    // Prep gains and buffer pointers outside the frame loop
-    float gains[kMaxTracks];
-    int16_t* buffers[kMaxTracks];
-    for (unsigned track = 0; track < kMaxTracks; track++) {
+    // Outer loop to redo setup at loop restart
+    while (num_frames) {
 
-        // Master scale factor that includes track gain, master gain, and conversion from 16-bit to 24-bit.
-        // This gives us the smoothest volume control we can get with the hardware and samples we've got.
-        float g = self->tracks[track].track_gain * self->master_gain * 256.f;
+        // Prep gains and buffer pointers outside the frame loop
+        float gains[kMaxTracks];
+        int16_t* buffers[kMaxTracks];
+        for (unsigned track = 0; track < kMaxTracks; track++) {
 
-        buffers[track] = self->tracks[track].samples;
-        if (buffers[track] == 0 || self->tracks[track].sample_count != self->loop_length) {
-            // Don't support different lengths now. If anything's wrong, mute the track.
-            g = 0;
-        }
-        gains[track] = g;
-    }
+            // Master scale factor that includes track gain, master gain, and conversion from 16-bit to 24-bit.
+            // This gives us the smoothest volume control we can get with the hardware and samples we've got.
+            float g = self->tracks[track].track_gain * self->master_gain * 256.f;
 
-    unsigned sample_number = self->sample_number;
-    for (unsigned frame = 0; frame < num_frames; frame++) {
-        if (sample_number >= self->loop_length) {
-            sample_number = 0;
-        }
-        for (unsigned channel = 0; channel < kNumChannels; channel++) {
-            int accum = 0;
-            for (unsigned track = 0; track < kMaxTracks; track++) {
-                float g = gains[track];
-                if (g) {
-                    int16_t *lr = buffers[track] + sample_number*2;
-                    accum += (gains[track] * self->tracks[track].l_gains[channel]) * lr[0];
-                    accum += (gains[track] * self->tracks[track].r_gains[channel]) * lr[1];
-                }
+            buffers[track] = self->tracks[track].samples;
+            if (buffers[track] == 0 || self->tracks[track].sample_count != self->loop_length) {
+                // Don't support different lengths now. If anything's wrong, mute the track.
+                g = 0;
             }
-            buffer[frame].ch[channel] = accum;
+            gains[track] = g;
         }
-        sample_number++;
+
+        unsigned sample_number = self->sample_number;
+        while (num_frames) {
+            if (sample_number >= self->loop_length) {
+                sample_number = 0;
+                self->resetLoop();
+                break;
+            }
+
+            for (unsigned channel = 0; channel < kNumChannels; channel++) {
+                int accum = 0;
+                for (unsigned track = 0; track < kMaxTracks; track++) {
+                    float g = gains[track];
+                    if (g) {
+                        int16_t *lr = buffers[track] + sample_number*2;
+                        accum += (gains[track] * self->tracks[track].l_gains[channel]) * lr[0];
+                        accum += (gains[track] * self->tracks[track].r_gains[channel]) * lr[1];
+                    }
+                }
+                buffer[0].ch[channel] = accum;
+            }
+            buffer++;
+            num_frames--;
+            sample_number++;
+        }
+        self->sample_number = sample_number;
     }
-    self->sample_number = sample_number;
 }
