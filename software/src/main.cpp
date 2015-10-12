@@ -12,7 +12,7 @@ static LoopMixer mixer;
 
 int main(int argc, char **argv)
 {
-    narrator.runner.setLayout("layouts/grid32x16z.json");
+    narrator.runner.setLayout("layouts/front/layout.json");
     if (!narrator.runner.parseArguments(argc, argv)) {
         return 1;
     }

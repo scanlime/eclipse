@@ -6,14 +6,14 @@
 
     "mixer": {
 
-        "master_level": -28,
+        "master_level": -23,
 
         "tracks": [
             { "file": "data/progression Loop Drone.wav",    "level": 0   },
-            { "file": "data/progression Air.wav",           "level": -7  },
+            { "file": "data/progression Air.wav",           "level": -12 },
             { "file": "data/progression Drums.wav",         "level": -10 },
             { "file": "data/progression Mini Strings.wav",  "level": -9  },
-            { "file": "data/progression Glass.wav",         "level": -7  },
+            { "file": "data/progression Glass.wav",         "level": 0  },
             { "file": "data/progression GlassWarp.wav",     "level": -9  }
         ]
     },
