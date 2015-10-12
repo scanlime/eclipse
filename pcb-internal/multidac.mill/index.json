@@ -6,9 +6,7 @@
     "spoilboard" : {
       "stockRegistration" : 0
     },
-    "bracket" : {
-      "stockRegistration" : 1
-    }
+    "bracket" : null
   },
   "plans" : [
     "6AF3A8F0-FD3C-439D-A4F6-522C477EDDE2"
@@ -16,19 +14,19 @@
   "stock" : {
     "height" : 50.8,
     "depth" : 1.651,
-    "flipped" : false,
+    "flipped" : true,
     "laminate" : "8D174BD6-C35D-4CCA-9A16-32EE5E9C251D",
     "offset" : {
-      "y" : 9.621007792068864,
+      "y" : 9.602,
       "b" : 0,
       "z" : 0,
-      "x" : 5.718907025090574,
+      "x" : 57.32,
       "a" : 0,
       "c" : 0
     },
     "width" : 76.199,
     "name" : "(unknown)",
-    "zrotation" : -0.0003599345702578494
+    "zrotation" : 0
   },
   "displayUnits" : "mm",
   "showDimensions" : true,
