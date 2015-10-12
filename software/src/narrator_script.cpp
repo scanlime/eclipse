@@ -30,70 +30,26 @@ int Narrator::script(int st, PRNG &prng)
 
     switch (st) {
 
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        // Special states
-
-        case 1: {
-            // Darkness only ("off")
-            crossfade(&darkness, 1);
-            delayForever();
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        // Opening sequence
-
-        case 0: {
-            // Darkness until opening
-
-            crossfade(&darkness, 1);
-            delayUntilDate(config["opening"]["date"]);
-            return config["opening"]["nextState"].GetInt();
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////////
-        // Cyclic states
-
         default: {
             endCycle();
             return 10;
         }
 
         case 10: {
-            // Bang. Explosive energy, hints of self-organization
+            ringsA.reseed(prng.uniform32());
+            crossfade(&ringsA, s.value(config["ringsA-Crossfade"]));
+            attention(s, config["ringsA-Attention"]);
+            return 20;
+        }
 
-            ChaosParticles *pChaosA = &chaosA;
-            ChaosParticles *pChaosB = &chaosB;
-
-            int bangCount = s.value(config["bangCount"]);
-            for (int i = 0; i < bangCount; i++) {
-                pChaosA->reseed(prng.circularVector() * s.value(config["bangSeedRadius"]), prng.uniform32());
-                crossfade(pChaosA, s.value(config["bangCrossfadeDuration"]));
-                delay((1 << i) * s.value(config["bangDelayBasis"]));
-                std::swap(pChaosA, pChaosB);
-            }
-
-            attention(s, config["bangAttention"]);
-
+        case 20: {
+            ringsB.reseed(prng.uniform32());
+            crossfade(&ringsB, s.value(config["ringsB-Crossfade"]));
+            attention(s, config["ringsB-Attention"]);
             return 30;
         }
 
         case 30: {
-            // Textures of light, exploring something formless. Slow crossfade in
-            ringsA.reseed(prng.uniform32());
-            crossfade(&ringsA, s.value(config["ringsA-Crossfade"]));
-            attention(s, config["ringsA-Attention"]);
-            return 40;
-        }
-
-        case 40: {
-            // Add energy, explore another layer.
-            ringsB.reseed(prng.uniform32());
-            crossfade(&ringsB, s.value(config["ringsB-Crossfade"]));
-            attention(s, config["ringsB-Attention"]);
-            return 50;
-        }
-
-        case 50: {
             // Biology happens, order emerges. Cellular look, emergent order.
 
             orderParticles.reseed(prng.uniform32());
@@ -104,10 +60,10 @@ int Narrator::script(int st, PRNG &prng)
                 orderParticles.symmetry--;
             }
             attention(s, config["orderStepAttention"]);
-            return 60;
+            return 40;
         }
 
-        case 60: {
+        case 40: {
             // Two partners, populations of particles.
             // Spiralling inwards. Depression. Beauty on the edge of destruction,
             // pressing forward until nothing remains.
@@ -115,16 +71,16 @@ int Narrator::script(int st, PRNG &prng)
             partnerDance.reseed(prng.uniform32());
             crossfade(&partnerDance, s.value(config["partnerCrossfade"]));
             attention(s, config["partnerAttention"]);
-            return 70;
+            return 50;
         }
 
-        case 70: {
+        case 50: {
             // Sinking deeper. Interlude before a change.
 
             ringsC.reseed(prng.uniform32());
             crossfade(&ringsC, s.value(config["ringsC-Crossfade"]));
             attention(s, config["ringsC-Attention"]);
-            return 80;
+            return 60;
         }
     }
 }

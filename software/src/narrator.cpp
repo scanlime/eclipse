@@ -10,7 +10,7 @@
 
 
 Narrator::Narrator()
-    : brightness(mixer)
+    : brightness(mixer), sensor(0)
 {
     runner.setEffect(&brightness);
 }
@@ -26,6 +26,11 @@ void Narrator::setup()
     if (!logFile) {
         perror("Failed to open narrator log file");
     }
+}
+
+void Narrator::useSensor(EclSensor &s)
+{
+    sensor = &s;
 }
 
 void Narrator::run()
@@ -48,7 +53,7 @@ void Narrator::endCycle()
     if (logFile) {
         time_t now = time(NULL);
         char timeBuffer[256];
-        ctime_r(&now, timeBuffer);        
+        ctime_r(&now, timeBuffer);
 
         fprintf(logFile, "\n------ Summary : %s", timeBuffer);
         fprintf(logFile, "      loop total ");
@@ -73,6 +78,22 @@ void Narrator::endCycle()
 
 EffectRunner::FrameStatus Narrator::doFrame()
 {
+    // xxx: Temporary display for sensor state
+    if (sensor) {
+        const EclSensor::Packet *p;
+        while ((p = sensor->poll())) {
+            if (p->tx_id == 0) {
+                // Home cursor
+                printf("\e[H");
+            }
+            printf("Tx %2d :", p->tx_id);
+            for (unsigned i = 0; i < EclSensor::kRxCount; i++) {
+                printf(" %5d", p->rx_timers[i]);
+            }
+            printf("\n");
+        }
+    }
+
     EffectRunner::FrameStatus st = runner.doFrame();
 
     totalTime += st.timeDelta;
